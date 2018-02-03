@@ -4,8 +4,6 @@ apply plugin: 'com.github.dcendents.android-maven'
 group = "com.github.urizev"
 
 android {
-    publishNonDefault true
-
     compileSdkVersion 26
 
     defaultConfig {
@@ -60,6 +58,20 @@ dependencies {
 
     androidTestImplementation 'com.android.support.test:runner:1.0.1'
     androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.1'
+}
+
+if( android.productFlavors.size() > 0 ) {
+    android.libraryVariants.all { variant ->
+        if( android.publishNonDefault && variant.name == android.defaultPublishConfig ) {
+            def bundleTask = tasks["bundle${name.capitalize()}"]
+            artifacts {
+                archives(bundleTask.archivePath) {
+                    classifier null
+                    builtBy bundleTask
+                }
+            }
+        }
+    }
 }
 
 // build a jar with source files
